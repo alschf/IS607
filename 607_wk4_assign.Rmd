@@ -1,0 +1,113 @@
+---
+title: "607_week4_assign"
+author: "Alex Satz"
+date: "September 20, 2014"
+output: html_document
+---
+
+**Strategy**
+Best Movie -> -> highest number votes + rating
+
+
+**Normalizing Number Of Votes**
+Num of votes will need to be adjusted to a 1-10 scale by using a 
+combination of the log10 function and the max number of votes in the file 
+(see loop at end of insert below and print of v.1)
+
+```{r}
+require(plyr)
+require(ggplot2)
+file <- read.table(file = "/Users/alexandersatz/Documents/Cuny/IS607/week4/movies.tab", quote = "", fill = TRUE, sep = "\t", header = TRUE, stringsAsFactors = TRUE)
+nrow(file)
+file.1 <- 0
+file.1 <- file
+file.s <- file.1[order(file.1$votes, decreasing = TRUE),]
+##head(file.s)
+div <- 0
+div = log10(max(file.s$votes, na.rm = TRUE))  #used to normalize the num of votes
+
+v.1 <-0
+v.1 <- vector()
+##v.l <- c(1:nrow(file.1)-1, NA)
+
+for (i in 1:nrow(file.1))
+{
+  v.1[i] <- (log10(as.vector(file.1[i,6]))/div)*10
+}
+
+
+file.1$votes.norm <- v.1 
+head(v.1)
+
+```
+
+Next we generate the 'total score' by combining num votes + rating and divide by 2 (see v.tot)
+```{r}
+v.tot <- 0
+v.tot <- vector()
+##length(v.tot)
+for (i in 1:nrow(file.1))
+{
+  if ( is.na(file.1[i,"votes.norm"]) | is.na(file.1[i,"rating"]))
+  {
+    v.tot[i] <- 0
+  }
+  else
+  {
+    v.tot[i] <- (file.1[i,"votes.norm"] + file.1[i,"rating"])/2
+  }
+  
+}
+
+
+
+file.1$score.total <-v.tot
+head(v.tot)
+
+```
+
+Then we adjust this final score a little so that the max value will be 10, and the min will be 0.
+
+```{r}
+min.s <- min(file.1$score.total)
+max.s <- max(file.1$score.total) - min.s
+
+score.final <- 0
+score.final <- vector()
+for (i in 1:nrow(file.1))
+{
+  score.final[i] <-  10*((file.1[i, "score.total" ]-min.s) / max.s)
+}
+
+
+file.1$score.fin <- score.final
+head(score.final)
+
+```
+
+And finally we use the ddply function to find the 'Best' movie for each year
+
+```{r}
+df.best.movies <-0
+v.score <-0
+v.score <- vector()
+df.best.movies <-ddply(file.1,c ("year"),function(x)
+{
+  index <- which.max(x$score.fin)
+  title <- x[index, "title"] 
+  score <- max(x$score.fin)
+  data.frame(best.movie = title, score)
+})
+df.best.movies <-df.best.movies[! is.na(df.best.movies[,"year"]), ]
+df.best.movies <- df.best.movies[order(df.best.movies$year, decreasing = TRUE),]
+head(df.best.movies)
+
+```
+
+Below is the plot of the highest score for each year!
+
+```{r, echo=FALSE}
+ggplot(df.best.movies, aes(x=year, y = score)) + geom_point()
+```
+
+

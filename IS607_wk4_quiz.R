@@ -1,4 +1,4 @@
-file <- read.table(file = "/Users/alexandersatz/Documents/Cuny/IS607/week4/movies.tab", fill = TRUE, sep = "\t", header = TRUE, stringsAsFactors=FALSE)
+file <- read.table(file = "/Users/alexandersatz/Documents/Cuny/IS607/week4/movies.tab", quotes = "", fill = TRUE, sep = "\t", header = TRUE, stringsAsFactors=FALSE)
 
 
 ##################################################################
