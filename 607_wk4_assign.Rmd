@@ -110,4 +110,18 @@ Below is the plot of the highest score for each year!
 ggplot(df.best.movies, aes(x=year, y = score)) + geom_point()
 ```
 
+And last we keep all movies with a score >8.5 
+which we use as a threshold for a 'best popular' movie
 
+```{r}
+df.year.best <-0
+df.year.best <- file.1[file.1[,"score.fin"]> 8.5, ]
+head(df.year.best)
+```
+
+And the histogram shows 1999 to be the best year for movies ever...This 
+conincides with 1999 also having the highest ranked movie of all time,
+Shawshank Redemption, which had a score of 10, the highest possible.
+```{r, echo=FALSE}
+ggplot(data = df.year.best) + geom_histogram(aes(x=year), binwidth = 1)
+```

@@ -68,9 +68,19 @@ df.best.movies <-ddply(file.1,c ("year"),function(x)
   score <- max(x$score.fin)
   data.frame(best.movie = title, score)
 })
-
+df.best.movies <-df.best.movies[! is.na(df.best.movies[,"year"]), ]
 df.best.movies <- df.best.movies[order(df.best.movies$year, decreasing = TRUE),]
 
 ggplot(df.best.movies, aes(x=year, y = score)) + geom_point()
+
+head(file.1)
+df.year.best <-0
+df.year.best <- file.1[file.1[,"score.fin"]> 8.5, ]
+head(df.year.best)
+
+ggplot(data = df.year.best) + geom_histogram(aes(x=year), binwidth = 1)
+
+
+
 
 
