@@ -1,0 +1,59 @@
+---
+title: "IS607 Week 6 Assignment"
+author: "Alex SAtz"
+date: "October 3, 2014"
+output: html_document
+---
+Below is an article on rock climbing in the Gunks.  I use rvest to get the webpage and then further to extract the 'title' nodes.  Converting to text yeilds the Title itself.  
+```{r}
+library(devtools)
+library(rvest)
+page <- html("http://adventure.nationalgeographic.com/adventure/trips/americas-best-adventures/climb-new-york-gunks/")
+article.title <- page %>% 
+  html_nodes("title") %>%
+  html_text() 
+article.title
+```
+
+I thought I would try a table too, by extracting nodes with "table".  I then use the html_table function to convert the result to a dataframe.  The table is still messy however.
+
+```{r}
+## I wanted to try a table.  Below the weather forcast is extracted
+table1 <- html("http://www.mountainproject.com/v/cathedral-ledge/105908823")
+table2 <- table1 %>%
+  html_nodes("table") 
+forecast <- html_table(table2[[4]], fill = TRUE)
+```
+
+Below I clean up the dataframe.  
+
+```{r}
+forecast.new <- data.frame()
+for (i in 1:ncol(forecast))
+{
+  forecast.new[1,i] = forecast[1,i]
+  forecast.new[2,i] = gsub("\n\t\t|\n\t\t", "", forecast[2,i])
+}
+forecast.new
+```
+
+
+Below I use the XML readHTMLTable function to attempt to read the table as above.  This is an easy thing to do and yeilds the same result as for rvest (prior to cleaning).
+```{r}
+library(RCurl)
+library(XML)
+
+page <- readHTMLTable("http://www.mountainproject.com/v/cathedral-ledge/105908823", which = 4)
+page
+```
+
+I also used Rcurl to extract the title as above with rvest.  This worked well, as shown below.  I actually liked this method more than with rvest, as I'm more familiar with text searching.  This may be computationally slower however...
+
+```{r}
+page <- readLines("http://adventure.nationalgeographic.com/adventure/trips/americas-best-adventures/climb-new-york-gunks/")
+##page ## very nice a huge 'list' of each line which can be sliced by line
+title <-page[grep("<title", page)]  
+title ## which yeilds title, albiet needing some cleaning up
+```
+
+

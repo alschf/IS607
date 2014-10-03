@@ -10,11 +10,10 @@ install_github("hadley/rvest")
 library(rvest)
 ##########################################################
 ## A article I recently saw...
-page <- html("http://www.dddmag.com/news/2014/10/discovery-helps-spot-what-makes-good-drug?et_cid=4186194&et_rid=416384129&location=top")
-
+page <- html("http://adventure.nationalgeographic.com/adventure/trips/americas-best-adventures/climb-new-york-gunks/")
 ## Below I extract the articles title
 article.title <- page %>% 
-  html_nodes("h") %>%
+  html_nodes("title") %>%
   html_text() 
 article.title
 
@@ -36,5 +35,26 @@ for (i in 1:ncol(forecast))
 forecast.new
 
 #############################################################
-## I'll do the optional stuff later on...guess I don't have to turn it in.
+## Optional #1
+
+# list all available demos
+demo(package="rvest") 
+# lists code for tripadvisor demo; follow instructions 
+# in your RStudio console window.
+demo("tripadvisor", "rvest") 
+
+#########################################################
+library(RCurl)
+library(XML)
+
+page <- readHTMLTable("http://www.mountainproject.com/v/cathedral-ledge/105908823")
+page
+# Interestingly, the table I extracted with rvest isn't 'page' when extracted by readHTMLTable...
+
+
+page <- readLines("http://adventure.nationalgeographic.com/adventure/trips/americas-best-adventures/climb-new-york-gunks/")
+page ## very nice a huge 'list' of each line which can be sliced by line
+title <-page[grep("<title", page)]  
+title ## which yeilds title, albiet needing some cleaning up
+
 
