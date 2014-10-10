@@ -1,0 +1,36 @@
+---
+title: "Project 3 IS607"
+author: "Alex SAtz"
+date: "October 9, 2014"
+output: html_document
+---
+
+Clean data has been extracted from SQL into a dataframe.  The most common languages at 7 and 8 pm were selected for (top 100). The data was then 'spread' using tidyr and 'mutated' to calculate the ratio of page hits for each language at 8 and 7 pm.  This yeilds 49 ratios after removing nulls (cases where a language was in the top100 at one time, but not the other).  Bosnian shows a 40% increase Slokian and Norweigan show the largest decrease.  Interestingly, the results do not obviously correlate with timezone.  Perhaps one hour isn't a large enough span.
+
+```{r}
+library(RPostgreSQL)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+con <- dbConnect(PostgreSQL(), user= "alexandersatz",  dbname="wk7assign")
+rs <- dbGetQuery(con, "select count(c.lang), c.lang, c.datehour from cleandata2 c group by c.lang, c.datehour Order by count(c.lang) desc limit 100") 
+
+
+rs <-spread(rs, datehour, count)
+colnames(rs) <- c("lang", "Seven", "Eight")
+rs2 <-mutate(rs, 
+               diff = as.numeric(Seven)/as.numeric(Eight))
+
+rs3 <- na.omit(rs2)
+rs3 <-arrange(rs3, desc(diff))
+rs3
+```
+
+Below is the plot of counts at 8pm divided by counts at 7pm (grouped by language)
+
+```{r, echo=FALSE}
+ggplot(data=rs3, aes(x=lang, y=diff, group=1)) + geom_line() + geom_point()
+```
+
+The language code bs (bosnian) appears to show the largest gain of 40%.  The language did have a 
+relatively low # of page hits however (3000-5000).
